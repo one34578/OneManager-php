@@ -141,7 +141,7 @@ function install()
                 $AccessKeySecret = $_POST['AccessKeySecret'];
                 $tmp['AccessKeySecret'] = $AccessKeySecret;
             }
-            $response = SetbaseConfig($tmp, $_SERVER['accountId'], $_SERVER['region'], $_SERVER['service_name'], $_SERVER['function_name'], $AccessKeyID, $AccessKeySecret);
+            $response = json_decode(SetbaseConfig($tmp, $_SERVER['accountId'], $_SERVER['region'], $_SERVER['service_name'], $_SERVER['function_name'], $AccessKeyID, $AccessKeySecret), true);
             if (api_error($response)) {
                 $html = api_error_msg($response);
                 $title = 'Error';
@@ -317,7 +317,7 @@ function api_error($response)
 
 function api_error_msg($response)
 {
-    return json_encode( $response, JSON_PRETTY_PRINT );
+    return $response;
     return $response['Error']['Code'] . '<br>
 ' . $response['Error']['Message'] . '<br><br>
 function_name:' . $_SERVER['function_name'] . '<br>
@@ -337,7 +337,7 @@ function OnekeyUpate($auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 
     $outPath = '/tmp/';
 
     // 从github下载对应tar.gz，并解压
-    $url = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . $branch . '/';
+    $url = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . urlencode($branch) . '/';
     $tarfile = '/tmp/github.tar.gz';
     file_put_contents($tarfile, file_get_contents($url));
     $phar = new PharData($tarfile);
