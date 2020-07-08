@@ -250,7 +250,7 @@ function_name:' . $_SERVER['function_name'] . '<br>
 function OnekeyUpate($auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 'master')
 {
     //'https://github.com/qkqpttgf/OneManager-php/tarball/master/';
-    $source = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . $branch . '/';
+    $source = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . urlencode($branch) . '/';
     return json_decode(updateHerokuapp(getConfig('function_name'), getConfig('APIKey'), $source)['body'], true);
 }
 
