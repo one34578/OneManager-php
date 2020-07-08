@@ -263,7 +263,7 @@ function OnekeyUpate($auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 
     $projectPath = splitlast(__DIR__, '/')[0];
 
     // 从github下载对应tar.gz，并解压
-    $url = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . $branch . '/';
+    $url = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . urlencode($branch) . '/';
     $tarfile = $projectPath.'/github.tar.gz';
     $githubfile = file_get_contents($url);
     if (!$githubfile) return 0;
