@@ -454,7 +454,11 @@ function get_access_token($refresh_token)
         $tmp['shareapiurl'] = $_SERVER['api_url'];
         if (getConfig('shareapiurl')=='') setConfig($tmp);
     } else {
-        $response = curl_request( $_SERVER['oauth_url'] . 'token', 'client_id='. $_SERVER['client_id'] .'&client_secret='. $_SERVER['client_secret'] .'&grant_type=refresh_token&requested_token_use=on_behalf_of&refresh_token=' . $refresh_token );
+        $p=0;
+        while ($response['stat']==0&&$p<3) {
+            $response = curl_request( $_SERVER['oauth_url'] . 'token', 'client_id='. $_SERVER['client_id'] .'&client_secret='. $_SERVER['client_secret'] .'&grant_type=refresh_token&requested_token_use=on_behalf_of&refresh_token=' . $refresh_token );
+            $p++;
+        }
         if ($response['stat']==200) $ret = json_decode($response['body'], true);
         if (!isset($ret['access_token'])) {
             error_log($_SERVER['oauth_url'] . 'token'.'?client_id='. $_SERVER['client_id'] .'&client_secret='. $_SERVER['client_secret'] .'&grant_type=refresh_token&requested_token_use=on_behalf_of&refresh_token=' . $refresh_token);
