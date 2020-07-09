@@ -448,9 +448,11 @@ function get_access_token($refresh_token)
             error_log('failed to get share access_token. response' . json_encode($ret));
             throw new Exception($response['stat'].', failed to get share access_token.'.$response['body']);
         }
-        error_log('['.$_SERVER['disktag'].'] Get access token:'.json_encode($ret, JSON_PRETTY_PRINT));
+        $tmp = $ret;
+        $tmp['access_token'] = '******';
+        error_log('['.$_SERVER['disktag'].'] Get access token:'.json_encode($tmp, JSON_PRETTY_PRINT));
         savecache('access_token', $_SERVER['access_token']);
-        $tmp = [];
+        $tmp = null;
         $tmp['shareapiurl'] = $_SERVER['api_url'];
         if (getConfig('shareapiurl')=='') setConfig($tmp);
     } else {
@@ -461,11 +463,14 @@ function get_access_token($refresh_token)
         }
         if ($response['stat']==200) $ret = json_decode($response['body'], true);
         if (!isset($ret['access_token'])) {
-            error_log($_SERVER['oauth_url'] . 'token'.'?client_id='. $_SERVER['client_id'] .'&client_secret='. $_SERVER['client_secret'] .'&grant_type=refresh_token&requested_token_use=on_behalf_of&refresh_token=' . $refresh_token);
+            error_log($_SERVER['oauth_url'] . 'token'.'?client_id='. $_SERVER['client_id'] .'&client_secret='. $_SERVER['client_secret'] .'&grant_type=refresh_token&requested_token_use=on_behalf_of&refresh_token=' . substr($refresh_token, 0, 20) . '******' . substr($refresh_token, -20));
             error_log('failed to get ['.$_SERVER['disktag'].'] access_token. response' . json_encode($ret));
             throw new Exception($response['stat'].', failed to get ['.$_SERVER['disktag'].'] access_token.'.$response['body']);
         }
-        error_log('['.$_SERVER['disktag'].'] Get access token:'.json_encode($ret, JSON_PRETTY_PRINT));
+        $tmp = $ret;
+        $tmp['access_token'] = '******';
+        $tmp['refresh_token'] = '******';
+        error_log('['.$_SERVER['disktag'].'] Get access token:'.json_encode($tmp, JSON_PRETTY_PRINT));
         $_SERVER['access_token'] = $ret['access_token'];
         savecache('access_token', $_SERVER['access_token'], $ret['expires_in'] - 300);
         if (time()>getConfig('token_expires')) setConfig([ 'refresh_token' => $ret['refresh_token'], 'token_expires' => time()+7*24*60*60 ]);
@@ -1582,7 +1587,10 @@ function get_refresh_token()
                     }
                 }
             }
-            document.cookie=\'disktag=\'+t.disktag_add.value+\'; path=/\';
+            var expd = new Date();
+            expd.setTime(expd.getTime()+(2*60*60*1000));
+            var expires = "expires="+expd.toGMTString();
+            document.cookie=\'disktag=\'+t.disktag_add.value+\'; path=/; \'+expires;
             return true;
         }
     </script>';
@@ -1873,8 +1881,8 @@ function render_list($path = '', $files = '')
 -->';
     //$authinfo = $path . '<br><pre>' . json_encode($files, JSON_PRETTY_PRINT) . '</pre>';
 
-    
     if (isset($_COOKIE['theme'])&&$_COOKIE['theme']!='') $theme = $_COOKIE['theme'];
+    if ( !file_exists(__DIR__.'/theme/'.$theme) ) $theme = '';
     if ( $theme=='' ) {
         $tmp = getConfig('customTheme');
         if ( $tmp!='' ) $theme = $tmp;
@@ -1904,9 +1912,6 @@ function render_list($path = '', $files = '')
             }
             
         }
-        //$fp = fopen($file_path,"r");
-        //$html = fread($fp,filesize($file_path));
-        //fclose($fp);
 
         $tmp = splitfirst($html, '<!--IconValuesStart-->');
         $html = $tmp[0];
