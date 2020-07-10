@@ -7,6 +7,9 @@ $Base64Env = [
     //'SecretKey', // used in SCF.
     //'AccessKeyID', // used in FC.
     //'AccessKeySecret', // used in FC.
+    //'HW_urn', // used in FG.
+    //'HW_key', // used in FG.
+    //'HW_secret', // used in FG.
     //'admin',
     //'adminloginpage',
     'background',
@@ -49,6 +52,9 @@ $CommonEnv = [
     'SecretKey', // used in SCF.
     'AccessKeyID', // used in FC.
     'AccessKeySecret', // used in FC.
+    'HW_urn', // used in FG.
+    'HW_key', // used in FG.
+    'HW_secret', // used in FG.
     'admin',
     'adminloginpage',
     'background',
@@ -73,6 +79,9 @@ $ShowedCommonEnv = [
     //'SecretKey', // used in SCF.
     //'AccessKeyID', // used in FC.
     //'AccessKeySecret', // used in FC.
+    //'HW_urn', // used in FG.
+    //'HW_key', // used in FG.
+    //'HW_secret', // used in FG.
     //'admin',
     'adminloginpage',
     'background',
@@ -452,9 +461,9 @@ function get_access_token($refresh_token)
         $tmp['access_token'] = '******';
         error_log('['.$_SERVER['disktag'].'] Get access token:'.json_encode($tmp, JSON_PRETTY_PRINT));
         savecache('access_token', $_SERVER['access_token']);
-        $tmp = null;
-        $tmp['shareapiurl'] = $_SERVER['api_url'];
-        if (getConfig('shareapiurl')=='') setConfig($tmp);
+        $tmp1 = [];
+        $tmp1['shareapiurl'] = $_SERVER['api_url'];
+        if (getConfig('shareapiurl')=='') setConfig($tmp1);
     } else {
         $p=0;
         while ($response['stat']==0&&$p<3) {
